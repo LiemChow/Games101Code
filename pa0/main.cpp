@@ -40,9 +40,23 @@ int main(){
     std::cout << "Example of output \n";
     std::cout << i << std::endl;
     // matrix add i + j
+    std::cout << i + j << std::endl;
     // matrix scalar multiply i * 2.0
+    std::cout << i * 2.0 << std::endl;
     // matrix multiply i * j
+    std::cout << i * j << std::endl;
     // matrix multiply vector i * v
+    std::cout << i * v << std::endl;
+
+    Eigen::Vector3f p(2.0f, 1.0f, 1.0f);
+    float angle = 45.0/180.0 * acos(-1);
+
+    Eigen::Matrix3f trans;
+    trans << cos(angle), -sin(angle), 1.0f,
+        sin(angle), cos(angle), 2.0f,
+        0.0f, 0.0f, 1.0f;
+
+    std::cout << trans * p << std::endl;
 
     return 0;
 }
