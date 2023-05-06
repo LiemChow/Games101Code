@@ -27,6 +27,16 @@ Eigen::Matrix4f get_model_matrix(float rotation_angle)
     // Create the model matrix for rotating the triangle around the Z axis.
     // Then return it.
 
+    float angle = rotation_angle / 180.0f * acos(-1);
+
+    Eigen::Matrix4f rotation;
+    rotation << cos(angle), -sin(angle), 0.f, 0.f,
+        sin(angle), cos(angle), 0.f, 0.f,
+        0.f, 0.f, 1.f, 0.f,
+        0.f, 0.f, 0.f, 1.f;
+
+    model = rotation * model;
+
     return model;
 }
 
@@ -41,7 +51,52 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
     // Create the projection matrix for the given parameters.
     // Then return it.
 
+    Eigen::Matrix4f proj;
+
+    proj << zNear, 0.0f, 0.0f, 0.0f,
+        0.0f, zNear, 0.0f, 0.0f,
+        0.0f, 0.0f, zNear + zFar, -zNear * zFar,
+        0.0f, 0.0f, 1.0f, 0.0f;
+
+    float w,h,z;
+    h = zNear * tan(eye_fov / 2.0f) * 2.0f;
+    w = h * aspect_ratio;
+    z = zFar - zNear;
+
+    Eigen::Matrix4f ortho;
+    ortho << 2.0f/w, 0.0f, 0.0f, 0.0f,
+        0.0f, 2.0f/h, 0.0f, 0.0f,
+        0.0f, 0.0f, 2.0f / z, -(zFar + zNear) / 2.0f,
+        0.0f, 0.0f, 0.0f, 1.0f;
+
+    projection = ortho * proj * projection;
+
     return projection;
+}
+
+Eigen::Matrix4f get_rotation(Vector3f axis, float rotation_angle){
+    Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
+
+    float angle = rotation_angle / 180.0f * acos(-1);
+
+    Eigen::Matrix4f I;
+    I << 1.f, 0.f, 0.f, 0.f,
+        0.f, 1.f, 0.f, 0.f,
+        0.f, 0.f, 1.f, 0.f,
+        0.f, 0.f, 0.f, 1.f;
+    
+    Eigen::Vector4f Axis;
+    Axis << axis.x(), axis.y(), axis.z(), 0;
+
+    Eigen::Matrix4f N;
+    N << 0.f, -axis.z(), axis.y(), 0,
+        axis.z(), 0.f, -axis.x(), 0.f,
+        -axis.y(), axis.x(), 0.f, 0.f,
+        0.f, 0.f, 0.f, 1.f;
+
+    model = cos(angle) * I + (1.f - cos(angle)) * Axis * Axis.transpose() + sin(angle) * N ;
+    
+    return model;
 }
 
 int main(int argc, const char** argv)
@@ -94,6 +149,7 @@ int main(int argc, const char** argv)
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
         r.set_model(get_model_matrix(angle));
+        // r.set_model(get_rotation({0,0,1}, 60));
         r.set_view(get_view_matrix(eye_pos));
         r.set_projection(get_projection_matrix(45, 1, 0.1, 50));
 
