@@ -22,10 +22,13 @@ Triangle::Triangle()
     tex_coords[2] << 0.0, 0.0;
 }
 
+//三角形三个顶点
 void Triangle::setVertex(int ind, Eigen::Vector3f ver) { v[ind] = ver; }
 
+//三角形向量
 void Triangle::setNormal(int ind, Vector3f n) { normal[ind] = n; }
 
+//三角形的颜色
 void Triangle::setColor(int ind, float r, float g, float b)
 {
     if ((r < 0.0) || (r > 255.) || (g < 0.0) || (g > 255.) || (b < 0.0) ||
@@ -36,11 +39,14 @@ void Triangle::setColor(int ind, float r, float g, float b)
     color[ind] = Vector3f((float)r / 255., (float)g / 255., (float)b / 255.);
     return;
 }
+
+//设置uv的坐标
 void Triangle::setTexCoord(int ind, float s, float t)
 {
     tex_coords[ind] = Vector2f(s, t);
 }
 
+//把三角形的点转换为齐次坐标形式
 std::array<Vector4f, 3> Triangle::toVector4() const
 {
     std::array<Vector4f, 3> res;
